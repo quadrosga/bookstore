@@ -31,6 +31,11 @@ RUN apt-get update \
 # Install Poetry using recommended method
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
+# Install postgres dependencies
+RUN apt-get update \
+    && apt-get -y install libpq-dev gcc \
+    && pip install psycopg2
+
 # Verify Poetry installation
 RUN poetry --version
 

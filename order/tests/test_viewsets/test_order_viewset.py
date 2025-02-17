@@ -26,9 +26,9 @@ class TestOrderViewSet(APITestCase):
         self.order = OrderFactory(product=[self.product])
 
     def test_order(self):
-        token = Token.objects.get(user__username=self.user.username)  # get user token
+        token = Token.objects.get(user__username=self.user.username)  # get user token created in setUp
         self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + token.key)  # credentials
+            HTTP_AUTHORIZATION="Token " + token.key)  # add auth token to header
         response = self.client.get(
             reverse("order-list", kwargs={"version": "v1"}))
 
@@ -52,7 +52,7 @@ class TestOrderViewSet(APITestCase):
     def test_create_order(self):
         token = Token.objects.get(user__username=self.user.username)  # get user token
         self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + token.key)  # credentials
+            HTTP_AUTHORIZATION="Token " + token.key)  # add auth token to header
         
         product = ProductFactory()
         data = json.dumps({"products_id": [product.id], "user": self.user.id})
@@ -85,7 +85,7 @@ class TestOrderViewSet(APITestCase):
     def test_delete_order(self):
         token = Token.objects.get(user__username=self.user.username)  # get user token
         self.client.credentials(
-            HTTP_AUTHORIZATION="Token " + token.key)  # credentials
+            HTTP_AUTHORIZATION="Token " + token.key)  # add auth token to header
         response = self.client.delete(
             reverse("order-detail", kwargs={"version": "v1", "pk": self.order.id})
         )

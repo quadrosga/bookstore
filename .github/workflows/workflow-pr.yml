@@ -1,0 +1,43 @@
+name: Python Pull Request Workflow
+on: [pull_request]
+
+jobs:
+  qa:
+    name: Quality check
+    runs-on: ubuntu-18.04
+
+    steps:
+      # Checkout the code using the latest stable version
+      - uses: actions/checkout@v2
+
+      # Set up Python using the stable version of setup-python
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      # Install poetry and dependencies
+      - name: Install poetry
+        run: |
+          pip install poetry
+          poetry install
+        env:
+          POETRY_VIRTUALENVS_CREATE: false
+
+      # View poetry help to verify it works correctly
+      - name: View poetry --help
+        run: poetry --help
+
+      # Run tests using poetry
+      - name: Test
+        run: |
+          poetry run python manage.py test
+
+      # Run Wemake Python Styleguide
+      - name: Wemake Python Styleguide
+        uses: wemake-services/wemake-python-styleguide@0.16.0
+        continue-on-error: true
+        with:
+          reporter: "github-pr-review"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

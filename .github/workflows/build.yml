@@ -12,7 +12,6 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      # Adding a PostgreSQL service
       db:
         image: postgres:13
         ports:
@@ -21,6 +20,12 @@ jobs:
           POSTGRES_USER: bookstore_dev
           POSTGRES_PASSWORD: bookstore_dev
           POSTGRES_DB: bookstore_dev_db
+        # Wait for PostgreSQL to be ready before proceeding
+        options: >-
+          --health-cmd="pg_isready -U bookstore_dev" 
+          --health-interval=10s 
+          --health-timeout=5s 
+          --health-retries=5
 
     steps:
       - uses: actions/checkout@v2
@@ -45,9 +50,15 @@ jobs:
         shell: bash
         run: poetry install
 
-      # Start Docker Compose and run tests within the container
       - name: Start Docker Compose services
         run: docker-compose up -d --build
+
+      - name: Wait for database to be ready
+        run: |
+          until docker-compose exec -T db pg_isready -U bookstore_dev; do
+            echo "Waiting for database to be ready..."
+            sleep 5
+          done
 
       - name: Run Tests
         run: docker-compose exec -T web python manage.py test

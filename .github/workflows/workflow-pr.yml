@@ -7,10 +7,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the code using the latest stable version
+      # Checkout the code
       - uses: actions/checkout@v2
 
-      # Set up Python using the stable version of setup-python
+      # Set up Python
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -21,33 +21,24 @@ jobs:
         run: |
           pip install poetry
           poetry install --no-interaction --no-root
-          poetry lock
         env:
-          POETRY_VIRTUALENVS_CREATE: true # Ensures virtualenv creation
+          POETRY_VIRTUALENVS_CREATE: true
 
-      # View poetry help to verify it works correctly
-      - name: View poetry --help
-        run: poetry --help
+      # Ensure virtual environment is activated
+      - name: Verify virtualenv
+        run: poetry env info
 
-      # Check if virtualenv is activated and installed packages
-      - name: Check if virtualenv is activated
-        run: |
-          poetry run python -m venv --help
-
+      # List installed packages
       - name: List installed packages
-        run: |
-          poetry run pip list
+        run: poetry run pip list
 
-      # Explicitly install Django if it's missing
-      - name: Explicitly add Django
-        run: |
-          poetry add django
-          poetry install --no-interaction
+      # Ensure PYTHONPATH is correctly set
+      - name: Set PYTHONPATH
+        run: echo "PYTHONPATH=$(pwd)" >> $GITHUB_ENV
 
       # Run tests using poetry
-      - name: Test
-        run: |
-          poetry run python manage.py test
+      - name: Run Django Tests
+        run: poetry run python manage.py test
 
       # Run Wemake Python Styleguide
       - name: Wemake Python Styleguide

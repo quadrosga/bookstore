@@ -22,16 +22,26 @@ jobs:
           pip install poetry
           poetry install --no-interaction --no-root
         env:
-          POETRY_VIRTUALENVS_CREATE: false
+          POETRY_VIRTUALENVS_CREATE: true # Ensures virtualenv creation
 
       # View poetry help to verify it works correctly
       - name: View poetry --help
         run: poetry --help
 
-      # Check installed packages to ensure Django is installed
-      - name: Check installed packages
+      # Check if virtualenv is activated and installed packages
+      - name: Check if virtualenv is activated
         run: |
-          poetry run pip freeze
+          poetry run python -m venv --help
+
+      - name: List installed packages
+        run: |
+          poetry run pip list
+
+      # Explicitly install Django if it's missing
+      - name: Explicitly add Django
+        run: |
+          poetry add django
+          poetry install --no-interaction
 
       # Run tests using poetry
       - name: Test

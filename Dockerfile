@@ -42,12 +42,13 @@ RUN apt-get update \
 # install poetry - respects $POETRY_VERSION & $POETRY_HOME
 RUN pip install poetry poetry init
 
-RUN pip install whitenoise
+RUN pip install --no-cache-dir whitenoise
 
 # install postgres dependencies inside of Docker
 RUN apt-get update \
     && apt-get -y install libpq-dev gcc \
-    && pip install psycopg2
+    && pip install --no-cache-dir psycopg2 \
+    && apt-get clean \
 
 # copy project requirement files here to ensure they will be cached.
 WORKDIR $PYSETUP_PATH

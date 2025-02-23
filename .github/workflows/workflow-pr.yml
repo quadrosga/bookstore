@@ -20,13 +20,18 @@ jobs:
       - name: Install poetry
         run: |
           pip install poetry
-          poetry install
+          poetry install --no-interaction
         env:
           POETRY_VIRTUALENVS_CREATE: false
 
       # View poetry help to verify it works correctly
       - name: View poetry --help
         run: poetry --help
+
+      # Check Python version to ensure correct environment
+      - name: Check Python version
+        run: |
+          poetry run python --version
 
       # Run tests using poetry
       - name: Test

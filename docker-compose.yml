@@ -1,46 +1,25 @@
 services:
+  db:
+    image: postgres:13.0-alpine
+    ports:
+      - 5433:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=bookstore_dev
+      - POSTGRES_PASSWORD=bookstore_dev
+      - POSTGRES_DB=bookstore_dev_db
   web:
     build: .
-    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/usr/src/app/
     ports:
       - 8000:8000
     env_file:
       - ./.env.dev
-    networks:
-      - backend
     depends_on:
       - db
-    # Optional healthcheck for waiting for DB readiness
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "dev", "-d", "bookstore_db"]
-      interval: 10s
-      retries: 5
-      start_period: 30s
-      timeout: 10s
-
-  db:
-    image: postgres:13.0-alpine
-    volumes:
-      - postgres_data:/var/lib/postgres/data/
-    environment:
-      - POSTGRES_USER=dev
-      - POSTGRES_PASSWORD=dev
-      - POSTGRES_DB=bookstore_db
-    networks:
-      - backend
-    # Optional healthcheck for ensuring DB is up
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "dev", "-d", "bookstore_db"]
-      interval: 10s
-      retries: 5
-      start_period: 30s
-      timeout: 10s
-
-networks:
-  backend:
-    driver: bridge
 
 volumes:
   postgres_data:

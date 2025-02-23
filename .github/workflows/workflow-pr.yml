@@ -20,7 +20,7 @@ jobs:
       - name: Install poetry
         run: |
           pip install poetry
-          poetry install --no-interaction
+          poetry install --no-interaction --no-root
         env:
           POETRY_VIRTUALENVS_CREATE: false
 
@@ -28,10 +28,10 @@ jobs:
       - name: View poetry --help
         run: poetry --help
 
-      # Check Python version to ensure correct environment
-      - name: Check Python version
+      # Check installed packages to ensure Django is installed
+      - name: Check installed packages
         run: |
-          poetry run python --version
+          poetry run pip freeze
 
       # Run tests using poetry
       - name: Test

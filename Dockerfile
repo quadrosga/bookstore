@@ -40,9 +40,9 @@ RUN apt-get update \
         build-essential
 
 # install poetry - respects $POETRY_VERSION & $POETRY_HOME
-RUN pip install poetry poetry init
+RUN pip install --no-cache-dir poetry poetry init
 
-RUN pip install whitenoise
+RUN pip install --no-cache-dir whitenoise
 
 # Install PostgreSQL dependencies inside of Docker
 RUN apt-get update \
@@ -63,7 +63,7 @@ RUN poetry install --no-root
 RUN poetry install
 RUN poetry lock
 
-RUN pip install psycopg2
+RUN pip install --no-cache-dir psycopg2
 
 WORKDIR /app
 

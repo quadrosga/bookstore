@@ -27,9 +27,11 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+    
 # Install Poetry
 RUN pip install --no-cache-dir poetry
-
+RUN poetry run pip install --no-cache-dir psycopg2
+    
 # Install Whitenoise
 RUN pip install --no-cache-dir whitenoise
 

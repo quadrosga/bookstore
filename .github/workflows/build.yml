@@ -20,7 +20,6 @@ jobs:
           POSTGRES_USER: bookstore_dev
           POSTGRES_PASSWORD: bookstore_dev
           POSTGRES_DB: bookstore_dev_db
-        # Wait for PostgreSQL to be ready before proceeding
         options: >-
           --health-cmd="pg_isready -U bookstore_dev" 
           --health-interval=10s 
@@ -47,18 +46,20 @@ jobs:
           python -m pip install --upgrade poetry
 
       - name: Install dependencies
-        shell: bash
-        run: poetry install
+        run: poetry install --no-root
 
       - name: Start Docker Compose services
         run: docker-compose up -d --build
 
       - name: Wait for database to be ready
         run: |
-          until docker-compose exec -T db pg_isready -U bookstore_dev; do
-            echo "Waiting for database to be ready..."
+          until docker-compose exec -T db pg_isready -h db -U bookstore_dev; do
+            echo "Waiting for PostgreSQL to be ready..."
             sleep 5
           done
 
       - name: Run Tests
-        run: docker-compose exec -T web python manage.py test
+        run: docker-compose run --rm web python manage.py test
+
+    env:
+      DJANGO_SECRET_KEY: "temporary-secret-key"

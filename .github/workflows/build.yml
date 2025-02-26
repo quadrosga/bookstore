@@ -11,21 +11,6 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    services:
-      db:
-        image: postgres:13
-        ports:
-          - 5434:5432
-        env:
-          POSTGRES_USER: bookstore_dev
-          POSTGRES_PASSWORD: bookstore_dev
-          POSTGRES_DB: bookstore_dev_db
-        options: >-
-          --health-cmd="pg_isready -U bookstore_dev" 
-          --health-interval=10s 
-          --health-timeout=5s 
-          --health-retries=5
-
     steps:
       - uses: actions/checkout@v2
 
@@ -34,32 +19,18 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install Docker Compose
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose
-
       - name: Install poetry
         run: |
           python -m ensurepip
           python -m pip install --upgrade pip
           python -m pip install --upgrade poetry
+      - name: View poetry --help
+        run: poetry --help
 
       - name: Install dependencies
-        run: poetry install --no-root
+        shell: bash
+        run: python -m poetry install
 
-      - name: Start Docker Compose services
-        run: docker-compose up -d --build
-
-      - name: Wait for database to be ready
+      - name: Test
         run: |
-          until docker-compose exec -T db pg_isready -h db -U bookstore_dev; do
-            echo "Waiting for PostgreSQL to be ready..."
-            sleep 5
-          done
-
-      - name: Run Tests
-        run: docker-compose run --rm web python manage.py test
-
-    env:
-      DJANGO_SECRET_KEY: "temporary-secret-key"
+          poetry run python manage.py test

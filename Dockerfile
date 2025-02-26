@@ -40,14 +40,16 @@ RUN apt-get update \
         build-essential
 
 # install poetry - respects $POETRY_VERSION & $POETRY_HOME
-RUN pip install poetry poetry init
+RUN pip install --no-cache-dir poetry poetry init
 
-RUN pip install whitenoise
+RUN pip install --no-cache-dir whitenoise
 
-# install postgres dependencies inside of Docker
+# Install PostgreSQL dependencies inside of Docker
 RUN apt-get update \
     && apt-get -y install libpq-dev gcc \
-    && pip install psycopg2
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip install --no-cache-dir psycopg2
 
 # copy project requirement files here to ensure they will be cached.
 WORKDIR $PYSETUP_PATH
@@ -61,7 +63,7 @@ RUN poetry install --no-root
 RUN poetry install
 RUN poetry lock
 
-RUN pip install psycopg2
+RUN pip install --no-cache-dir psycopg2
 
 WORKDIR /app
 

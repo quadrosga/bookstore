@@ -6,7 +6,7 @@ authors = ["Gabriela Quadros do Amaral <quadros.ga@hotmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.10.5"
+python = ">=3.10.5,<3.13"
 pytest = "^7.4.3"
 factory-boy = "^3.3.0"
 django = "^4.2.7"

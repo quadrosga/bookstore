@@ -1,0 +1,50 @@
+name: Python Pull Request Workflow
+on: [pull_request]
+
+jobs:
+  qa:
+    name: Quality check
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the code
+      - uses: actions/checkout@v2
+
+      # Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.11"
+
+      # Install poetry and dependencies
+      - name: Install poetry
+        run: |
+          pip install poetry
+          poetry install --no-interaction --no-root
+        env:
+          POETRY_VIRTUALENVS_CREATE: true
+
+      # Ensure virtual environment is activated
+      - name: Verify virtualenv
+        run: poetry env info
+
+      # List installed packages
+      - name: List installed packages
+        run: poetry run pip list
+
+      # Ensure PYTHONPATH is correctly set
+      - name: Set PYTHONPATH
+        run: echo "PYTHONPATH=$(pwd)" >> $GITHUB_ENV
+
+      # Run tests using poetry
+      - name: Run Django Tests
+        run: poetry run python manage.py test
+
+      # Run Wemake Python Styleguide
+      - name: Wemake Python Styleguide
+        uses: wemake-services/wemake-python-styleguide@0.16.0
+        continue-on-error: true
+        with:
+          reporter: "github-pr-review"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

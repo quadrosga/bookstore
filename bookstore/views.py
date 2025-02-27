@@ -4,23 +4,29 @@ from django.views.decorators.csrf import csrf_exempt
 import git
 from pathlib import Path
 
+import os
+import git
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+
 @csrf_exempt
 def update(request):
     if request.method == "POST":
+        # Detect environment (Windows vs. Linux/PythonAnywhere)
+        if os.name == "nt":  # Windows
+            repo_path = "C:/Users/quadr/ebac/bookstore"
+        else:  # Linux (PythonAnywhere)
+            repo_path = "/home/quadrosga/bookstore"
+
         try:
-            repo = git.Repo('/home/quadrosga/bookstore')
+            repo = git.Repo(repo_path)
             origin = repo.remotes.origin
             origin.pull()
-
-            # Using pathlib instead of os.system("touch ...")
-            wsgi_file = Path("/var/www/quadrosga_pythonanywhere_com_wsgi.py")
-            wsgi_file.touch()
-
-            return HttpResponse("Updated code on PythonAnywhere and reloaded server.")
+            return HttpResponse("Updated code on PythonAnywhere")
         except Exception as e:
-            return HttpResponse(f"Error updating: {str(e)}", status=500)
+            return HttpResponse(f"Error updating: {e}")
     else:
-        return HttpResponse("Couldn't update the code on PythonAnywhere", status=400)
+        return HttpResponse("Couldn't update the code on PythonAnywhere")
 
 def hello_world(request):
     template = loader.get_template('hello_world.html')

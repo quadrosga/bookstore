@@ -22,7 +22,8 @@ def update(request):
         origin.pull()
         
         if os.name != "nt":
-            subprocess.run(["touch", "/var/www/quadrosga_pythonanywhere_com_wsgi.py"], check=True)
+            with open("/var/www/quadrosga_pythonanywhere_com_wsgi.py", "a"):
+                os.utime("/var/www/quadrosga_pythonanywhere_com_wsgi.py", None)
 
         return HttpResponse("Updated code on PythonAnywhere")
     except Exception as e:

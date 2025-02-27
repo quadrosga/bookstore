@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
 
-# Set up logging
+# Set up logging:
 log_file = "C:/Users/quadr/ebac/bookstore/update_server.log" if os.name == "nt" else "/tmp/update_server.log"
 
 logging.basicConfig(filename=log_file, level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")

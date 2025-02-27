@@ -1,6 +1,7 @@
 import logging
 import os
 import git
+import subprocess
 from django.http import HttpResponse
 from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
@@ -23,15 +24,15 @@ def update(request):
             origin.pull()
             
             logger.info("Successfully pulled latest code from GitHub.")
-            
+
             # Reload the web app on PythonAnywhere
             if os.name != "nt":  # Only run this on Linux/PythonAnywhere
-                os.system("touch /var/www/quadrosga_pythonanywhere_com_wsgi.py")
+                subprocess.run(["touch", "/var/www/quadrosga_pythonanywhere_com_wsgi.py"], check=True)
                 logger.info("WSGI file touched to reload the app.")
 
             return HttpResponse("Updated code on PythonAnywhere")
         except Exception as e:
-            logger.error(f"Error updating: {e}")
+            logger.error("Error updating repository", exc_info=True)
             return HttpResponse(f"Error updating: {e}", status=500)
 
     logger.warning("Received non-POST request at /upload_server/")

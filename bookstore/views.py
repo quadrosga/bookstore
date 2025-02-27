@@ -11,9 +11,8 @@ def update(request):
     if request.path == "/favicon.ico":
         return HttpResponse(status=204)  # No Content (Silently ignore it)
     
-    if request.method != "POST":
-        print("Received non-POST request at /upload_server/")
-        return HttpResponse("This endpoint only accepts POST requests.", status=405)
+    if request.method == "GET":
+        return HttpResponse("<h1>This is the webhook update endpoint.</h1><p>Send a POST request to trigger an update.</p>")
 
     try:
         repo_path = "/home/quadrosga/bookstore" if os.name != "nt" else "C:/Users/quadr/ebac/bookstore"

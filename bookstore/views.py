@@ -1,3 +1,11 @@
+from django.http import HttpResponse
+from django.template import loader
+from django.views.decorators.csrf import csrf_exempt
+
+import git
+import os
+
+
 @csrf_exempt
 def update(request):
     if request.method == "POST":
